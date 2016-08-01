@@ -23,6 +23,7 @@
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -86,6 +87,7 @@ SELECT
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -123,6 +125,7 @@ SELECT osm_id, way, waterway AS class
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -165,6 +168,7 @@ SELECT 0 AS osm_id, way
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -201,6 +205,7 @@ SELECT osm_id, way, aeroway AS type
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -230,6 +235,7 @@ SELECT osm_id, way, aeroway AS type
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -355,6 +361,7 @@ SELECT
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -400,12 +407,13 @@ SELECT
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
        <Parameter name="srid"><![CDATA[]]></Parameter>
        <Parameter name="table"><![CDATA[(
-SELECT osm_id, way, name AS name_en, CASE
+SELECT osm_id, way, COALESCE(tags->'name:en', name) AS name_en, CASE
       WHEN to_int(population) >= 250000000 THEN 1
       WHEN to_int(population) BETWEEN 100000000 AND  250000000 THEN 2
       WHEN to_int(population) BETWEEN 50000000 AND 100000000 THEN 3
@@ -436,6 +444,7 @@ SELECT osm_id, way, name AS name_en, CASE
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -453,7 +462,7 @@ SELECT
   DISTINCT ON (labelgrid(way, 64, !pixel_width!))
     osm_id,
     way,
-    get_label_name(name) AS name_en,
+    get_label_name(COALESCE(tags->'name:en', name)) AS name_en,
     place AS "type",
     'SE' AS ldir,
     1 AS localrank, -- TODO:
@@ -510,6 +519,7 @@ SELECT
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -520,7 +530,7 @@ SELECT osm_id, way1 AS way, name, name_en, rank AS scalerank, localrank, maki FR
   SELECT
     osm_id,
     name,
-    name AS name_en,
+    COALESCE(tags->'name:en', name) AS name_en,
     CASE
       WHEN railway='station' THEN 'rail'
       WHEN (tags->'subway') IS NOT NULL THEN 'rail-metro'
@@ -546,7 +556,7 @@ UNION ALL
   SELECT
     osm_id,
     name,
-    name AS name_en,
+    COALESCE(tags->'name:en', name) AS name_en,
     CASE
       WHEN railway='station' THEN 'rail'
       WHEN (tags->'subway') IS NOT NULL THEN 'rail-metro'
@@ -594,6 +604,7 @@ UNION ALL
        <Parameter name="geometry_table"><![CDATA[]]></Parameter>
        <Parameter name="host"><![CDATA[]]></Parameter>
        <Parameter name="key_field"><![CDATA[]]></Parameter>
+       <Parameter name="key_field_as_attribute"><![CDATA[]]></Parameter>
        <Parameter name="max_size"><![CDATA[512]]></Parameter>
        <Parameter name="password"><![CDATA[]]></Parameter>
        <Parameter name="port"><![CDATA[]]></Parameter>
@@ -603,7 +614,7 @@ SELECT osm_id, 'default' AS shield, way, name_en, ref, reflen, len FROM (
 SELECT
     osm_id,
     way,
-    name AS name_en,
+    COALESCE(tags->'name:en', name) AS name_en,
     CASE
       WHEN highway IN ('motorway', 'motorway_link', 'driveway') THEN highway
       WHEN highway IN ('primary', 'primary_link', 'trunk', 'trunk_link', 'secondary', 'secondary_link', 'tertiary', 'tertiary_link') THEN 'main'
